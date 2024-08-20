@@ -5,6 +5,12 @@ from .models import Account,AccountType,Currency,ExchangeRate,Transaction,Transa
 admin.site.register(AccountType)
 admin.site.register(Account)
 admin.site.register(Currency)
-admin.site.register(Transaction)
-admin.site.register(TransactionDetails)
 admin.site.register(ExchangeRate)
+
+class TransactionDetailsAdmin(admin.TabularInline):
+    model = TransactionDetails
+    extra = 2
+@admin.register(Transaction)
+
+class TransactionAdmin(admin.ModelAdmin):
+    inlines = [TransactionDetailsAdmin]
