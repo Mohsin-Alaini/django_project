@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+{{block.super}}
+<div class="page-wrapper">
+    <div class="content">
+            {% csrf_token %}
+            {% if id %}
+                <input type="hidden" value="{{id}}" name="id">
+            {% endif %}
+            {% crispy form form.helper %}
+            <input type='submit' value='submit'>
+            <button class="btn btn-primary" id="ajax_btn">حفظ</button>
+        
+        <div class="row" style="margin-top:10px;">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped custom-table mb-0" id="datatable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم النوع</th>
+                                <th>الوصف</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var table = new DataTable('#datatable', {
+        "paging": true,
+        "processing": true,
+        "serverSide": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        'pageLength':10,
+        "info": true,
+        'ajax': {
+            url: "{% url 'account_type_json' %}"
+        }
+    });
+
+    $(document).on('click', '#ajax_btn', function(){
+        $.ajax({
+            url: "{% url 'x2' %}",
+            method: 'get',
+            data: {id: 1},
+            success: function(response){
+                if(response.status == 1){
+                    alert(response.data);
+                }
+            },
+            error: function(){
+                alert('error');
+            },
+        });
+    });
+
+    var csrf = "{{ csrf_token }}";
+    var url = `{{url}}`
+    $(document).on("submit","#form-id", function(e){
+        e.preventDefault()
+        $.ajax({
+            url:url,
+            method:"POST",
+            "data":$("#form-id").serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("x-CSRFToken", csrf);
+            },
+            success:function(data){
+                $(`span[class="text-danger"]`).remove()
+                if(data.status == 1){
+                    alert(data.message)
+                    table.ajax.reload()
+                    $("#form-id")[0].reset();
+                    $("input[name$=id]").val("")
+                }
+                else if (data.status == 2){
+                    alert(data.message)
+
+                }
+                else{
+                    // var c = Array()
+                    // c.push(data)
+                    print_error_forms(data.errors,'form',true)                }
+            },
+            error:function(data){
+                alert("data error")
+                
+            },
+            })
+    });
+
+
+
+</script>
+{% endblock content %}
+
+
+
+
+{% comment %} {% extends 'base.html'%} 
+
+{% block content %}
+
+{{ block.super}}
+
+<form method='POST'>
+    {% csrf_token %}
+    {% if id  %}
+        <input type="hidden" value="{{id}}" name="id">
+    {% endif %}
+    {{form.as_p}}
+<input type='submit' value='submit'>
+<button  class="btn btn-primary" id="ajax_btn">حفظ</button>
+
+</form>
+{{cleaned_data}}
+<table border=1> 
+    <thead>
+        <tr>
+            <th>النوع</th>
+            <th>الوصف</th>
+            <th>#</th>
+            <th class="text-right">Action</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for type in data %}
+        <tr>
+            <td>
+                {{type.name}}
+            </td>
+            <td>
+                {{type.description}}
+            </td>
+            <td>
+                <a href="{{url}}?id={{type.id}}">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    alert('ddd')
+    $(document).on('click','#ajax_btn', function(){
+        $.ajax({
+            url: "{% url 'x2' %}",
+            method:'get',
+            data:{id:1},
+            success: function(response){
+                if(response.status == 1){
+                    alert(response.data);
+                }
+            },
+            error: function(){
+                alert('error');
+            },
+        });
+    });
+</script>
+{% endblock content %}  {% endcomment %}
+
+
+
+
