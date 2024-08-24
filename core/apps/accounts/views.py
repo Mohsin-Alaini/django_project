@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Q , Max , Min , Avg ,Sum, F
 from ..models import Currency,ExchangeRate,Account,TransactionDetails,Transaction
-from .forms import InfonForm
+from .forms import InfonForm,CurrencyForm
 # Create your views here.
 def view(request):
     # Currency.objects.create(code = 'YER',name = "Yemeni",local= True)
@@ -22,13 +22,16 @@ def view(request):
     #     print(cu) 
     
     if request.method == 'POST':
-        form = InfonForm(request.POST)
+        form = CurrencyForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            currency = form.save(commit=False)
+            currency.local = False
+            currency.save()
+            # print(form.cleaned_data['number'],'view')
         else:
             print(form.errors)
     else :
-        form = InfonForm()
+        form = CurrencyForm()
     context = {
         'form':form,
         # 'transactions' : transactions,
