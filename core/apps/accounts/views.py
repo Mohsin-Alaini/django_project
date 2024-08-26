@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Q , Max , Min , Avg ,Sum, F
 from ..models import Currency,ExchangeRate,Account,TransactionDetails,Transaction
-from .forms import InfonForm,CurrencyForm
+from .forms import AccountTypeForm, InfonForm,CurrencyForm
+from django.views import View
 # Create your views here.
 def view(request):
     # Currency.objects.create(code = 'YER',name = "Yemeni",local= True)
@@ -39,7 +40,41 @@ def view(request):
     }
     return render(request , 'account_page.html',context)
 
+# Class-Base-View
+class AbsView(View):
+    f = None 
+    template_name = None 
+    def get(self,request,*args, **kwargs):
+        form = self.f()
+        context = {
+            'form':form,
+        }
+        return render(request , self.template_name ,context)
+    
+    def post(self,request,*args,**kwargs):
+        form = self.f(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            self.save_model(obj)
+        else:
+            print(form.errors)
+        context = {
+        'form':form,
+        }
+        return render(request , self.template_name,context)
+    
+    def save_model(self,obj):
+        obj.save()
 
+class AccountTypeView(AbsView):
+    f = AccountTypeForm 
+    template_name = 'account_page.html'
+
+class CurrencyView(AbsView):
+    f = CurrencyForm 
+    template_name = 'account_page.html'
+
+  
 def view2(request,id):
     return HttpResponse('view2')
 def view3(request,id,name):

@@ -1,6 +1,6 @@
 from typing import Any
 from django import forms
-from apps.models import Currency
+from apps.models import Currency,AccountType
 
 class InfonForm(forms.Form): 
     name = forms.CharField(label="name",max_length=50)
@@ -38,3 +38,9 @@ class CurrencyForm(forms.ModelForm):
         model = Currency
         fields ="__all__"
 
+
+class AccountTypeForm(forms.ModelForm):
+    
+    class Meta:
+        model = AccountType
+        fields ="__all__"
