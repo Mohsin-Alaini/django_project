@@ -32,6 +32,8 @@ class CurrencyForm(forms.ModelForm):
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['code'].label = 'code'
+        self.fields['code'].initial = 'oop'
+        self.fields['code'].disabled = True 
     class Meta:
         model = Currency
         fields ="__all__"
