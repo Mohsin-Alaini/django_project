@@ -1,6 +1,6 @@
 from typing import Any
 from django import forms
-from apps.models import Currency,AccountType
+from apps.models import Account, Currency,AccountType
 
 class InfonForm(forms.Form): 
     name = forms.CharField(label="name",max_length=50)
@@ -38,9 +38,19 @@ class CurrencyForm(forms.ModelForm):
         model = Currency
         fields ="__all__"
 
-
 class AccountTypeForm(forms.ModelForm):
-    
+    def clean_name(self):
+        cleaned_data = self.cleaned_data
+        name = cleaned_data['name']  # if we want to get value from the dectionary
+        name = cleaned_data.get('name')
+        # self.add_error('name','hbvdchj')
+        return name
     class Meta:
         model = AccountType
         fields ="__all__"
+        
+class AccountForm(forms.ModelForm):
+    
+    class Meta:
+        model = Account
+        fields = '__all__'

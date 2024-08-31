@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Q , Max , Min , Avg ,Sum, F
-from ..models import Currency,ExchangeRate,Account,TransactionDetails,Transaction
+from ..models import Currency,ExchangeRate,Account,TransactionDetails,Transaction,AccountType
 from .forms import AccountTypeForm, InfonForm,CurrencyForm
 from django.views import View
+from django.urls import reverse
 # Create your views here.
 def view(request):
     # Currency.objects.create(code = 'YER',name = "Yemeni",local= True)
@@ -45,6 +46,8 @@ class AbsView(View):
     f = None 
     template_name = None 
     def get(self,request,*args, **kwargs):
+        account = Account.objects.first().balance()
+        
         form = self.f()
         context = {
             'form':form,
@@ -66,9 +69,9 @@ class AbsView(View):
     def save_model(self,obj):
         obj.save()
 
-class AccountTypeView(AbsView):
-    f = AccountTypeForm 
-    template_name = 'account_page.html'
+# class AccountTypeView(AbsView):
+#     f = AccountTypeForm 
+#     template_name = 'account_page.html'
 
 class CurrencyView(AbsView):
     f = CurrencyForm 
@@ -79,3 +82,29 @@ def view2(request,id):
     return HttpResponse('view2')
 def view3(request,id,name):
     return HttpResponse('view3')
+
+class AccountTypeView(View):
+    def get(self, request, *args, **kwargs):
+        account_type = AccountType.objects.all()
+        form = AccountTypeForm()
+        context = {
+            'form': form,
+            'data':account_type
+        }
+        return render(request, 'account_type.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        account_type = AccountType.objects.all()
+        form = AccountTypeForm(request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            print(type(form),'form_type')
+            obj = form.save()
+            print(type(obj),'form_type2')
+            # form.save()
+        context = {
+            'form': form,
+            'data':account_type,
+            # 'cleaned_data':cleaned_data
+        }
+        return render(request, 'account_type.html', context)
