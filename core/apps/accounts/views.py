@@ -85,17 +85,29 @@ def view3(request,id,name):
 
 class AccountTypeView(View):
     def get(self, request, *args, **kwargs):
-        account_type = AccountType.objects.all()
-        form = AccountTypeForm()
+        account_types = AccountType.objects.all()
+        if 'id' in request.GET.keys():
+            account_type = AccountType.objects.get(id=request.GET.get('id'))
+            form = AccountTypeForm(instance=account_type)
+        else:
+            form = AccountTypeForm()
         context = {
             'form': form,
-            'data':account_type
+            'data': account_types,
+            'url' : reverse('account_type'),
+            'id' : request.GET.get('id')
         }
         return render(request, 'account_type.html', context)
     
     def post(self, request, *args, **kwargs):
-        account_type = AccountType.objects.all()
-        form = AccountTypeForm(request.POST)
+        account_types = AccountType.objects.all()
+        if 'id' in request.POST.keys():
+            account_type = AccountType.objects.get(id=request.POST.get('id'))
+            form = AccountTypeForm(request.POST, instance=account_type)
+            
+        else :
+            form = AccountTypeForm(request.POST)
+        
         if form.is_valid():
             cleaned_data = form.cleaned_data
             print(type(form),'form_type')
@@ -104,7 +116,8 @@ class AccountTypeView(View):
             # form.save()
         context = {
             'form': form,
-            'data':account_type,
+            'data':account_types,
+            'url' : reverse('account_type')
             # 'cleaned_data':cleaned_data
         }
         return render(request, 'account_type.html', context)
