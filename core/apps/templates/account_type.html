@@ -1,9 +1,47 @@
 {% extends 'base.html'%} 
-
+{% load crispy_forms_tags %}
 {% block content %}
-
 {{ block.super}}
+<div class="page-wrapper">
+    <div class="content">
+            {% csrf_token %}
+            {% if id %}
+                <input type="hidden" value="{{id}}" name="id">
+            {% endif %}
+            {% crispy form form.helper %}
+            <input type='submit' value='submit'>
+            <button class="btn btn-primary" id="ajax_btn">حفظ</button>
+        
+        <div class="row" style="margin-top:10px;">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped custom-table mb-0" id="datatable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم النوع</th>
+                                <th>الوصف</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for type in data %}
+                            <tr>
+                                <td>{{type.name}}</td>
+                                <td>{{type.description}}</td>
+                                <td><a href="{{url}}?id={{type.id}}">Edit</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+
+{% comment %} 
 <form method='POST'>
     {% csrf_token %}
     {% if id %}
@@ -30,7 +68,7 @@
         </tr>
         {% endfor %}
     </tbody>
-</table>
+</table> {% endcomment %}
 {% endblock content %}
 
 
