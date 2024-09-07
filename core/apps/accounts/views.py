@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Q , Max , Min , Avg ,Sum, F
 from ..models import Currency,ExchangeRate,Account,TransactionDetails,Transaction,AccountType
 from .forms import AccountTypeForm, InfonForm,CurrencyForm
@@ -76,14 +76,15 @@ class AbsView(View):
 class CurrencyView(AbsView):
     f = CurrencyForm 
     template_name = 'account_page.html'
-
   
-def view2(request,id):
-    return HttpResponse('view2')
+def view2(request):
+    # raise Exception('error')
+    return JsonResponse({'status':1,'data':'response ok'})
+
 def view3(request,id,name):
     return HttpResponse('view3')
 
-class AccountTypeView(View):
+class AccountTypeView(View): 
     def get(self, request, *args, **kwargs):
         account_types = AccountType.objects.all()
         if 'id' in request.GET.keys():
@@ -121,3 +122,13 @@ class AccountTypeView(View):
             # 'cleaned_data':cleaned_data
         }
         return render(request, 'account_type.html', context)
+    
+
+from django_datatables_view.base_datatable_view import BaseDatatableView
+class AccountTypeJson(BaseDatatableView):
+    model = AccountType
+    columns = [
+        'id',
+        'name',
+        'description'
+    ]

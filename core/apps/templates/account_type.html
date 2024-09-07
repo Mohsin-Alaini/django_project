@@ -25,20 +25,44 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for type in data %}
-                            <tr>
-                                <td>{{type.name}}</td>
-                                <td>{{type.description}}</td>
-                                <td><a href="{{url}}?id={{type.id}}">Edit</a></td>
-                            </tr>
-                            {% endfor %}
+                            
                         </tbody>
                     </table>
-                </div>
+                </div> 
             </div>
         </div>
     </div>
 </div>
+<script>
+    var table = new DataTable('#datatable', {
+        "paging": true,
+        "processing": true,
+        "serverSide": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        'pageLength':10,
+        "info": true,
+        'ajax': {
+            url: "{% url 'account_type_json' %}"
+        }
+    });
+    $(document).on('click', '#ajax_btn', function(){
+        $.ajax({
+            url: "{% url 'view2' %}",
+            method: 'get',
+            data: {id: 1},
+            success: function(response){
+                if(response.status == 1){
+                    alert(response.data);
+                }
+            },
+            error: function(){
+                alert('error');
+            },
+        });
+    });
+</script>
 
 
 {% comment %} 
