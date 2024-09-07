@@ -35,14 +35,7 @@
 </div>
 <script>
     var table = new DataTable('#datatable', {
-        "paging": true,
         "processing": true,
-        "serverSide": true,
-        "lengthChange": true,
-        "searching": true,
-        "ordering": true,
-        'pageLength':10,
-        "info": true,
         'ajax': {
             url: "{% url 'account_type_json' %}"
         }

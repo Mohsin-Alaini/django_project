@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import view ,view2,view3,AccountTypeView,CurrencyView
+from .views import view ,view2,view3,AccountTypeView,CurrencyView,AccountTypeJson
 urlpatterns = [
+    path('accounttypejson/',AccountTypeJson.as_view(),name='account_type_json'),
     path('accounttype/',AccountTypeView.as_view(),name='account_type'),
     path('currency/',CurrencyView.as_view(),name='currency'),
     path('view1/',view,name='view1'),

@@ -4,7 +4,7 @@ from django.db.models import Q , Max , Min , Avg ,Sum, F
 from ..models import Currency,ExchangeRate,Account,TransactionDetails,Transaction,AccountType
 from .forms import AccountTypeForm, InfonForm,CurrencyForm
 from django.views import View
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 # Create your views here.
 def view(request):
     # Currency.objects.create(code = 'YER',name = "Yemeni",local= True)
@@ -130,5 +130,26 @@ class AccountTypeJson(BaseDatatableView):
     columns = [
         'id',
         'name',
-        'description'
+        'description',
+        'action'
     ]
+    order_columns = [
+        'id',
+        'name'
+    ]
+    counter = 0
+    url = reverse_lazy('account_type')
+    def render_column(self, row, column):
+        if column == 'id':
+            self.counter+= 1
+            return self.counter
+        elif column == 'action':
+            return '<a class="edit" data-url="{2}" data-id="{0}"' \
+                   'style="display: -webkit-inline-box;" data-toggle="tooltip"' \
+                   'title="{1}"><i class= "fa fa-edit"></i></a>' \
+                   '<a class="delete" data-url="{2}" data-id="{0}"' \
+                   'style="display: -webkit-inline-box;" data-toggle="tooltip"' \
+                   'title="{3}"><i class= "fa fa-trash"></i></a>' \
+                   .format(row.id, 'تعديل', self.url, "حذف")
+        
+        return super().render_column(row, column)
