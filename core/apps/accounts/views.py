@@ -110,10 +110,13 @@ class AccountTypeView(View):
             form = AccountTypeForm(request.POST)
         
         if form.is_valid():
-            cleaned_data = form.cleaned_data
-            print(type(form),'form_type')
-            obj = form.save()
-            print(type(obj),'form_type2')
+            form.save()
+            return JsonResponse({'status':1,'message':'تم الحفظ .....'})
+        return JsonResponse({'status':0, 'errors': [{'errors': form.errors.as_json()}]})
+            # cleaned_data = form.cleaned_data
+            # print(type(form),'form_type')
+            # obj = form.save()
+            # print(type(obj),'form_type2')
             # form.save()
         context = {
             'form': form,
@@ -139,6 +142,7 @@ class AccountTypeJson(BaseDatatableView):
     ]
     counter = 0
     url = reverse_lazy('account_type')
+    
     def render_column(self, row, column):
         if column == 'id':
             self.counter+= 1
@@ -153,3 +157,12 @@ class AccountTypeJson(BaseDatatableView):
                    .format(row.id, 'تعديل', self.url, "حذف")
         
         return super().render_column(row, column)
+    
+    def filter_queryset(self, qs):
+        sSearch = self.request.GET.get('search[value]')
+        if sSearch:
+            qs = qs.filter(Q(name__icontains=sSearch)
+                           |
+                           Q(description__icontains=sSearch))
+        
+        return qs

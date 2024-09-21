@@ -35,7 +35,14 @@
 </div>
 <script>
     var table = new DataTable('#datatable', {
+        "paging": true,
         "processing": true,
+        "serverSide": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        'pageLength':10,
+        "info": true, 
         'ajax': {
             url: "{% url 'account_type_json' %}"
         }
@@ -55,6 +62,41 @@
             },
         });
     });
+
+    var csrf = "{{ csrf_token }}";
+    var url = `{{url}}`
+    $(document).on("submit","#form-id", function(e){
+        e.preventDefault()
+        $.ajax({
+            url:url,
+            method:"POST",
+            "data":$("#form-id").serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("x-CSRFToken", csrf);
+            },
+            success:function(data){
+                $(`span[class="text-danger"]`).remove()
+                if(data.status == 1){
+                    alert(data.message)
+                    table.ajax.reload()
+                    $("#form-id")[0].reset();
+                    $("input[name$=id]").val("")
+                }
+                else if (data.status == 2){
+                    alert(data.message)
+
+                }
+                else{
+                    // var c = Array()
+                    // c.push(data)
+                    print_error_forms(data.errors)                }
+            },
+            error:function(data){
+                alert("data error")
+                
+            },
+            })
+    }); 
 </script>
 
 
