@@ -4,12 +4,12 @@
 {{ block.super}}
 <div class="page-wrapper">
     <div class="content">
+        <form method='post' id="form-id">
             {% csrf_token %}
-            {% if id %}
-                <input type="hidden" value="{{id}}" name="id">
-            {% endif %}
-            {% crispy form form.helper %}
+            <input type="hidden" name="id" id="id_id">
+            {% crispy form  %}
             <input type='submit' value='submit'>
+        </form> 
             <button class="btn btn-primary" id="ajax_btn">حفظ</button>
         
         <div class="row" style="margin-top:10px;">
@@ -96,6 +96,54 @@
                 
             },
             })
+    }); 
+
+    $(document).on("click",".edit", function(e){
+        e.preventDefault()
+        var url1 = $(this).data("url");
+        var id = $(this).data("id");
+        $.ajax({
+            url:url1,
+            method:"get",
+            data :{"id":id},    
+            success:function(data){
+                if(data.status == 1){
+                    fill_forms(data.data)
+                }
+                else{
+                    alert(data.message)
+                }    
+            },
+            error:function(){
+
+            },
+        })
+    }); 
+
+    $(document).on("click",".delete", function(e){
+        e.preventDefault()
+        var id = $(this).data("id");
+        x = confirm("are you sure?")
+        if(x){
+            $.ajax({
+                url:url,
+                method:"delete",
+                data :{"id":id},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("x-CSRFToken", csrf);
+                },    
+                success:function(data){
+                    if(data.status == 1){
+                        table.ajax.reload()
+                    } 
+                    alert(data.message)
+                },
+                error:function(){
+    
+                },
+            })
+
+        }
     }); 
 </script>
 

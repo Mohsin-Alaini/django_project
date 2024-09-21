@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.db.models import Q , Max , Min , Avg ,Sum, F
 from ..models import Currency,ExchangeRate,Account,TransactionDetails,Transaction,AccountType
 from .forms import AccountTypeForm, InfonForm,CurrencyForm
 from django.views import View
 from django.urls import reverse, reverse_lazy
+from django.core import serializers
+from django.db import transaction
 # Create your views here.
 def view(request):
     # Currency.objects.create(code = 'YER',name = "Yemeni",local= True)
@@ -88,8 +90,9 @@ class AccountTypeView(View):
     def get(self, request, *args, **kwargs):
         account_types = AccountType.objects.all()
         if 'id' in request.GET.keys():
-            account_type = AccountType.objects.get(id=request.GET.get('id'))
-            form = AccountTypeForm(instance=account_type)
+            account_type = AccountType.objects.filter(id=request.GET.get('id'))
+            return JsonResponse({'status':1,'data': serializers.serialize('json',account_type)})
+            # form = AccountTypeForm(instance=account_type)
         else:
             form = AccountTypeForm()
         context = {
@@ -99,10 +102,10 @@ class AccountTypeView(View):
             'id' : request.GET.get('id')
         }
         return render(request, 'account_type.html', context)
-    
-    def post(self, request, *args, **kwargs):
+       
+    def post(self, request, *args, **kwargs): 
         account_types = AccountType.objects.all()
-        if 'id' in request.POST.keys():
+        if request.POST.get('id'):
             account_type = AccountType.objects.get(id=request.POST.get('id'))
             form = AccountTypeForm(request.POST, instance=account_type)
             
@@ -111,6 +114,8 @@ class AccountTypeView(View):
         
         if form.is_valid():
             form.save()
+            if request.POST.get('id'):
+                return JsonResponse({'status':1,'message':'تم التعديل .....'})
             return JsonResponse({'status':1,'message':'تم الحفظ .....'})
         return JsonResponse({'status':0, 'errors': [{'errors': form.errors.as_json()}]})
             # cleaned_data = form.cleaned_data
@@ -118,15 +123,26 @@ class AccountTypeView(View):
             # obj = form.save()
             # print(type(obj),'form_type2')
             # form.save()
-        context = {
-            'form': form,
-            'data':account_types,
-            'url' : reverse('account_type')
-            # 'cleaned_data':cleaned_data
-        }
-        return render(request, 'account_type.html', context)
+        # context = {
+        #     'form': form,
+        #     'data':account_types,
+        #     'url' : reverse('account_type')
+        #     # 'cleaned_data':cleaned_data
+        # }
+        # return render(request, 'account_type.html', context)
     
-
+    def delete(self,request,*args, **kwargs):
+        try:
+            with transaction.atomic():
+                id = int(QueryDict(request.body).get('id'))
+                account_type = AccountType.objects.filter(id=id).first()
+                if account_type:
+                    account_type.delete()
+                    return JsonResponse({'status':1 , 'message': 'تم الحذف !'})
+                return JsonResponse({'status':1 , 'message': 'حدث خطأ'})
+        except Exception as e:
+            return JsonResponse({'status':1 , 'message': 'حدث خطأ'})
+            print(e) 
 from django_datatables_view.base_datatable_view import BaseDatatableView
 class AccountTypeJson(BaseDatatableView):
     model = AccountType
