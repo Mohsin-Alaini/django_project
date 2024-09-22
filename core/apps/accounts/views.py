@@ -143,6 +143,7 @@ class AccountTypeView(View):
         except Exception as e:
             return JsonResponse({'status':1 , 'message': 'حدث خطأ'})
             print(e) 
+
 from django_datatables_view.base_datatable_view import BaseDatatableView
 class AccountTypeJson(BaseDatatableView):
     model = AccountType

@@ -40,6 +40,7 @@ class CurrencyForm(forms.ModelForm):
         fields ="__all__"
 
 class AccountTypeForm(forms.ModelForm):
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
